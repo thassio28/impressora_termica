@@ -1,7 +1,7 @@
 # impressora_termica
-Impressora térmica  com atmega328p e cabeça térmica LTP02-245.
+<h1>Impressora térmica  com atmega328p e cabeça térmica LTP02-245.</h1>
 
-Para fazer uma impressão deve ser enviado o texto por meio da porta serial com o comando CR (13) ao final da frase, ao apertar o botão o texto é impresso e é retornado pela serial o texto recebido.
+Para fazer uma impressão deve ser enviado o texto por meio da porta serial com o comando CR (13) "\r" ao final da frase, ao apertar o botão o texto é impresso e é retornado pela serial o texto recebido.
 
 Tensão comunicação 3,3V
 BAUD = 9600

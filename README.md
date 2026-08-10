@@ -11,8 +11,7 @@ Clock interno 8 Mhz
 Código e esquema ainda em fase de desenvolvimento.
 
 Versão 1
-
-<img width="4160" height="3120" alt="Versão 1" src="https://raw.githubusercontent.com/thassio28/impressora_termica/refs/heads/main/IMG_20240727_220041_866.jpg" />
+<img width="1949" height="1981" alt="Versão 1" src="https://github.com/user-attachments/assets/d2e6456f-f486-4e7d-9f64-287764aa1da3" />
 
 Video impresão de texto: https://youtube.com/shorts/1QFV2fXhjIA?feature=share
 
@@ -24,4 +23,5 @@ Versão 2
 <img width="4160" height="3120" alt="Versão 2" src="https://github.com/user-attachments/assets/09d7b933-807f-4980-a1aa-9955c01f84ba" />
 
 O controle da cabeça térmica funciona da mesma forma entre a versão 1 e 2, na versão 2 foi adicionado um conversor buck para fazer a alimentação da cabeça térmica e uma memória para guardas alguns bitmaps.
+
 Atualização futura 2, talvez display OLED.

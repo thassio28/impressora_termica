@@ -132,6 +132,34 @@ static uint16_t txt_ini, txt_prox;
 static uint8_t txt_n, txt_colunas;
 
 /* ------------------------------------------------------------------------ */
+/* Copia de dados da flash (PROGMEM)                                        */
+/* Substituem strcpy_P/strcat_P/memcpy_P, que existem na avr-libc mas nao   */
+/* na biblioteca do XC8.                                                    */
+/* ------------------------------------------------------------------------ */
+
+static char *copiar_P(char *destino, const char *origem)
+{
+    char *d = destino;
+    while ((*d = pgm_read_byte(origem++)))
+        d++;
+    return destino;
+}
+
+static char *juntar_P(char *destino, const char *origem)
+{
+    copiar_P(destino + strlen(destino), origem);
+    return destino;
+}
+
+static void copiar_bytes_P(void *destino, const void *origem, uint8_t n)
+{
+    uint8_t *d = destino;
+    const uint8_t *o = origem;
+    while (n--)
+        *d++ = pgm_read_byte(o++);
+}
+
+/* ------------------------------------------------------------------------ */
 /* Tempo                                                                    */
 /* ------------------------------------------------------------------------ */
 
@@ -563,7 +591,7 @@ static void carregar_fonte(uint8_t n)
     if (n >= NUM_FONTES)
         n = 0;
     fonte_sel = n;
-    memcpy_P(&fonte, &fontes[n], sizeof(fonte_t));
+    copiar_bytes_P(&fonte, &fontes[n], sizeof(fonte_t));
 }
 
 static void selecionar_fonte(uint8_t n)
@@ -717,7 +745,7 @@ static uint8_t ler_botao(void)
 
 static void texto_slot(char *s, const char *prefixo_P, uint8_t slot)
 {
-    strcpy_P(s, prefixo_P);
+    copiar_P(s, prefixo_P);
     s += strlen(s);
     *s++ = '0' + slot;
     *s = 0;
@@ -763,9 +791,9 @@ static uint8_t receber_bitmap(uint8_t slot, uint16_t espera_inicial)
                 uint16_t ini = (cont_bytes - 1) & ~0xFF;
                 flash_gravar_pagina(base + ini, pagina_buf, cont_bytes - ini);
                 if (oled_ok) {
-                    strcpy_P(s, PSTR("Recebendo "));
+                    copiar_P(s, PSTR("Recebendo "));
                     numero_texto((uint16_t)((uint32_t)cont_bytes * 100 / BMP_TAMANHO), s + strlen(s));
-                    strcat_P(s, PSTR("%"));
+                    juntar_P(s, PSTR("%"));
                     oled_texto(1, s, 0);
                 }
                 if (cont_bytes == BMP_TAMANHO) {
@@ -867,20 +895,20 @@ static uint8_t previa_tipo, previa_pagina, previa_mais;
 static void menu_rotulo(uint8_t item, char *s)
 {
     switch (item) {
-    case M_IMP_TEXTO: strcpy_P(s, PSTR("Imprimir texto")); break;
+    case M_IMP_TEXTO: copiar_P(s, PSTR("Imprimir texto")); break;
     case M_FONTE:
-        strcpy_P(s, PSTR("Fonte:"));
-        strcat_P(s, fonte.nome);
+        copiar_P(s, PSTR("Fonte:"));
+        juntar_P(s, fonte.nome);
         break;
-    case M_VER_TEXTO: strcpy_P(s, PSTR("Ver texto")); break;
-    case M_IMP_BMP:   strcpy_P(s, PSTR("Imprimir bitmap")); break;
+    case M_VER_TEXTO: copiar_P(s, PSTR("Ver texto")); break;
+    case M_IMP_BMP:   copiar_P(s, PSTR("Imprimir bitmap")); break;
     case M_SLOT:
         texto_slot(s, PSTR("Slot "), slot_sel);
-        strcat_P(s, slot_ocupado(slot_sel) ? PSTR(": ocupado") : PSTR(": vazio"));
+        juntar_P(s, slot_ocupado(slot_sel) ? PSTR(": ocupado") : PSTR(": vazio"));
         break;
-    case M_VER_BMP:   strcpy_P(s, PSTR("Ver bitmap")); break;
-    case M_RECEBER:   strcpy_P(s, PSTR("Receber bitmap")); break;
-    default:          strcpy_P(s, PSTR("Avancar papel")); break;
+    case M_VER_BMP:   copiar_P(s, PSTR("Ver bitmap")); break;
+    case M_RECEBER:   copiar_P(s, PSTR("Receber bitmap")); break;
+    default:          copiar_P(s, PSTR("Avancar papel")); break;
     }
 }
 
@@ -1093,7 +1121,7 @@ static void processar_serial(void)
                 if (tela == TELA_MENU) {
                     char s[17];
                     numero_texto(texto_len, s);
-                    strcat_P(s, PSTR(" caracteres"));
+                    juntar_P(s, PSTR(" caracteres"));
                     mensagem(PSTR("Texto recebido"), s);
                 }
             }

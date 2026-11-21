@@ -105,8 +105,11 @@ static uint8_t slot_sel = 0;
 static fonte_t fonte;            /* copia em RAM da fonte selecionada */
 static uint8_t oled_ok = 0;
 
-static uint8_t EEMEM ee_fonte = 0;
-static uint8_t EEMEM ee_slot = 0;
+/* enderecos fixos na EEPROM. Nao usar EEMEM: ele cria uma secao .eeprom que
+ * o MPLAB/XC8 coloca dentro do .hex no endereco 0x810000, e o gravador
+ * recusa o arquivo ("muito grande"). EEPROM apagada = 0xFF -> valores padrao. */
+#define EE_FONTE  ((uint8_t *)0)
+#define EE_SLOT   ((uint8_t *)1)
 
 /* ---- impressao ---- */
 enum { JOB_NADA, JOB_TEXTO, JOB_BITMAP };
@@ -597,13 +600,13 @@ static void carregar_fonte(uint8_t n)
 static void selecionar_fonte(uint8_t n)
 {
     carregar_fonte(n);
-    eeprom_update_byte(&ee_fonte, fonte_sel);
+    eeprom_update_byte(EE_FONTE, fonte_sel);
 }
 
 static void selecionar_slot(uint8_t s)
 {
     slot_sel = (s < NUM_SLOTS) ? s : 0;
-    eeprom_update_byte(&ee_slot, slot_sel);
+    eeprom_update_byte(EE_SLOT, slot_sel);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1213,8 +1216,8 @@ int main(void)
     OCR2A = 124;
     TIMSK2 = (1 << OCIE2A);
 
-    carregar_fonte(eeprom_read_byte(&ee_fonte));
-    slot_sel = eeprom_read_byte(&ee_slot);
+    carregar_fonte(eeprom_read_byte(EE_FONTE));
+    slot_sel = eeprom_read_byte(EE_SLOT);
     if (slot_sel >= NUM_SLOTS)
         slot_sel = 0;
 

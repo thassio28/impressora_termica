@@ -198,11 +198,28 @@ static void uart_P(const char *s)
         uart_tx(c);
 }
 
+/* converte n para texto decimal em s (s precisa de 6 bytes).
+ * Substitui utoa(), que existe na avr-libc mas nao no XC8. */
+static char *numero_texto(uint16_t n, char *s)
+{
+    char tmp[5];
+    uint8_t i = 0;
+    char *p = s;
+    do {
+        tmp[i++] = '0' + (n % 10);
+        n /= 10;
+    } while (n);
+    while (i)
+        *p++ = tmp[--i];
+    *p = 0;
+    return s;
+}
+
 static void uart_num(uint16_t n)
 {
     char b[6];
     char *p = b;
-    utoa(n, b, 10);
+    numero_texto(n, b);
     while (*p)
         uart_tx(*p++);
 }
@@ -747,7 +764,7 @@ static uint8_t receber_bitmap(uint8_t slot, uint16_t espera_inicial)
                 flash_gravar_pagina(base + ini, pagina_buf, cont_bytes - ini);
                 if (oled_ok) {
                     strcpy_P(s, PSTR("Recebendo "));
-                    utoa((uint32_t)cont_bytes * 100 / BMP_TAMANHO, s + strlen(s), 10);
+                    numero_texto((uint16_t)((uint32_t)cont_bytes * 100 / BMP_TAMANHO), s + strlen(s));
                     strcat_P(s, PSTR("%"));
                     oled_texto(1, s, 0);
                 }
@@ -1075,7 +1092,7 @@ static void processar_serial(void)
                 novo_texto = 1;
                 if (tela == TELA_MENU) {
                     char s[17];
-                    utoa(texto_len, s, 10);
+                    numero_texto(texto_len, s);
                     strcat_P(s, PSTR(" caracteres"));
                     mensagem(PSTR("Texto recebido"), s);
                 }

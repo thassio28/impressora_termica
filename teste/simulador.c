@@ -18,13 +18,6 @@
 #include <string.h>
 #include <stdint.h>
 
-static char *utoa(unsigned v, char *s, int base)
-{
-    (void)base;
-    sprintf(s, "%u", v);
-    return s;
-}
-
 /* ---------------- registradores ---------------- */
 #include "avr/io.h"
 volatile uint8_t DDRB, PORTB, PINB, DDRC, PORTC, DDRD, PORTD, PIND;
